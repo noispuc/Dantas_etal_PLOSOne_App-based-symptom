@@ -1,7 +1,14 @@
-# ########################################
-# AVAILABLE 25/02/2021
-# App-based symptom tracking to optimize SARS-CoV-2 testing strategy using machine learning
-# ########################################
+# ##############################################################################
+# DATA PREPARATION AND DESCRIPTIVE ANALYSIS 
+#
+# Code for the paper: 
+# App-based symptom tracking to optimize SARS-CoV-2 testing strategy 
+# using machine learning
+#
+# Guilherme F.G. de Souza, Leonardo S.L. Bastos (@lslbastos)
+#
+# Available in February 25 2021
+# ##############################################################################
 
 
 
@@ -10,9 +17,9 @@ library(tidyverse)
 
 
 
-
 # Data input and preparation ----------------------------------------------
-dados = read_delim("Data/ddb_modelo_temporal_16-07_testes.csv",";", escape_double = FALSE, trim_ws = TRUE)
+dados = read_delim("Data/ddb_modelo_temporal_16-07_testes.csv",";",
+                    escape_double = FALSE, trim_ws = TRUE)
 
 dados = dados[-which(dados$test_result == "Inconclusivo"),]
 
@@ -39,40 +46,64 @@ dados = dados %>%
 
 
 
+
 # Descriptive Table (Table 1) ---------------------------------------------
-tabela = matrix(NA, ncol = 4, nrow = 27)
+df_descriptive <- 
+    dados %>% 
+    mutate(
+        participant = 1,
+        isFemale = if_else(Gender == "Feminino", 1, 0),
+        test_result = if_else(test_result == "Positivo", "Positive", "Negative")
+    ) %>% 
+    select(
+        test_result, participant, isFemale, idade_anos, CovidConfirmadoCasa, 
+        ProfissionalSaude, Coriza, Tosse, Mialgia, DorGarganta, Febre,
+        Diarreia, PerdaOlfato, Enjoo, FaltaAr, `NA-Sintoma`
+        ) %>% 
+    mutate_if(
+        is.factor, function(x) { if_else(as.character(x) == "TRUE", "Yes", "No")}
+    )
 
-colnames(tabela) = c("Testou Positivo",NA,"Testou Negativo",NA)
 
-positivos = dados %>% 
-    filter(test_result == "Positivo")
+ls_desc_labels <- 
+    list(
+        participant = "Participants, n (%)",
+        isFemale = "Gender, n (%)",
+        idade_anos = "Age (years), median (IQR)", 
+        CovidConfirmadoCasa = "Cohabitation - lives with a SARS-CoV-2 infected person, n(%)", 
+        ProfissionalSaude = "Health professional, n (%)", 
+        Coriza = "Coryza", 
+        Tosse = "Cough", 
+        Mialgia = "Myalgia", 
+        DorGarganta = "Sore throat", 
+        Febre = "Fever",
+        Diarreia = "Diarrhea", 
+        PerdaOlfato = "Loss of smell", 
+        Enjoo = "Nausea", 
+        FaltaAr = "Shortness of breath", 
+        `NA-Sintoma` = "No symptoms above"
+    )
 
-negativos = dados %>% 
-    filter(test_result == "Negativo")
 
-tabela[1,c(1,3)] = c(nrow(positivos),nrow(negativos))
 
-tabela[2,c(1,3)] = c(length(which(positivos$Gender == "Feminino"))/nrow(positivos)*100,length(which(negativos$Gender == "Feminino"))/nrow(negativos)*100)
+tb_descriptive_symptoms <- 
+    df_descriptive %>% 
+    gtsummary::tbl_summary(
+        by = test_result,
+        label = ls_desc_labels
+    ) %>% 
+    gtsummary::add_overall(col_label =  "Total")
+    
 
-tabela[3,] = c(mean(positivos$idade_anos),sd(positivos$idade_anos),mean(negativos$idade_anos),sd(negativos$idade_anos))
-
-# Calculating proportion of positive an negative for each variable (Age, Sex and self-reported symptoms)
-for (j in 4:25) {
-    tabela[j,c(1,3)] = c(length(which(positivos[,j + 2] == TRUE))/nrow(positivos) * 100,length(which(negativos[, j + 2] == TRUE))/nrow(negativos) * 100)
-}
-
-tabela[26,c(1,3)] = c(length(which(positivos$ProfissionalSaude == "TRUE"))/nrow(positivos)*100,length(which(negativos$ProfissionalSaude == "TRUE"))/nrow(negativos)*100)
-
-tabela[27,c(1,3)] = c(length(which(positivos$CovidConfirmadoCasa == "TRUE"))/nrow(positivos)*100,length(which(negativos$CovidConfirmadoCasa == "TRUE"))/nrow(negativos)*100)
-
-rownames(tabela) = c("Quantidade","Mulheres (%)","Idade (anos)",
-                      paste0(colnames(dados)[6:27]," (%)"),
-                     "Profissional de Saúde", 
-                     "Covid confirmado em casa")
 
 
 # Exporting Table
-write.csv2(tabela,"Output/Main/table1_descriptive_symptoms_2020-07-27.csv")
+write_csv2(tb_descriptive_symptoms$table_body %>%
+               select(Characteristics = var_label,
+                      Total    = stat_0,
+                      Negative = stat_1,
+                      Positive = stat_2),
+           "Output/Main/table1_descriptive_symptoms_2020-07-27.csv")
 
 
 # Finished

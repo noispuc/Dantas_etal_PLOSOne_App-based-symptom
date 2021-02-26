@@ -1,8 +1,14 @@
-# ########################################
-# AVAILABLE 25/02/2021
-# App-based symptom tracking to optimize SARS-CoV-2 testing strategy using machine learning
-# ########################################
-
+# ##############################################################################
+# HYPOTHESIS - PRE/POST MODEL COMPARISON
+#
+# Code for the paper: 
+# App-based symptom tracking to optimize SARS-CoV-2 testing strategy 
+# using machine learning
+#
+# Paula Maçaira
+#
+# Available in February 25 2021
+# ##############################################################################
 
 
 # Libraries ---------------------------------------------------------------

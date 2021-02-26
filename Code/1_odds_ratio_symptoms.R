@@ -1,7 +1,14 @@
-# ########################################
-# AVAILABLE 25/02/2021
-# App-based symptom tracking to optimize SARS-CoV-2 testing strategy using machine learning
-# ########################################
+# ##############################################################################
+# ASSOCIATION OF SYMPTONS WITH TEST RESULTS - ADJSUTED ODDS RATIO 
+#
+# Code for the paper: 
+# App-based symptom tracking to optimize SARS-CoV-2 testing strategy 
+# using machine learning
+#
+# Paula Maçaira
+#
+# Available in February 25 2021
+# ##############################################################################
 
 
 

@@ -1,7 +1,14 @@
-# ########################################
-# AVAILABLE 25/02/2021
-# App-based symptom tracking to optimize SARS-CoV-2 testing strategy using machine learning
-# ########################################
+# ##############################################################################
+# MODEL ESTIMATION AND EVALUATION
+#
+# Code for the paper: 
+# App-based symptom tracking to optimize SARS-CoV-2 testing strategy 
+# using machine learning
+#
+# Leila F. Dantas, João G.M. Gelli, Leonardo S.L. Bastos (@lslbastos) 
+#
+# Available in February 25 2021
+# ##############################################################################
 
 
 
@@ -632,17 +639,65 @@ matriz_confusao
 
 dados_after_pred <- data.frame(Predicted_result = previsao2,
                                dados_teste)
-dados_after_pred <- as_tibble(dados_after_pred) %>% print()
+dados_after_pred <- 
+    as_tibble(dados_after_pred) %>% 
+    mutate(
+        participant = 1,
+        isFemale = if_else(Gender == "Feminino", 1, 0),
+        type = case_when(
+            Predicted_result == "Positivo" & test_result == "Negativo" ~ "false_positive",
+            Predicted_result == "Negativo" & test_result == "Positivo" ~ "false_negative"
+        ),
+        participants = 1
+    ) %>% 
+    filter(!is.na(type)) %>% 
+    select(-c(Predicted_result, test_result)) %>% 
+    select(
+        type, participant, isFemale, idade_anos, CovidConfirmadoCasa, 
+        Coriza, Tosse, Mialgia, DorGarganta, Febre,
+        Diarreia, PerdaOlfato, Enjoo, FaltaAr
+    ) %>% 
+    mutate_if(
+        is.factor, function(x) { if_else(as.character(x) == "Sim", "Yes", "No")}
+    )
 
 
-false_positive <- filter(dados_after_pred, Predicted_result == "Positivo" &
-                             test_result == "Negativo")
-false_negative <- filter(dados_after_pred, Predicted_result == "Negativo" &
-                             test_result == "Positivo")
-summary(false_positive)
-summary(false_negative)
+
+ls_desc_labels_fp_fn <- 
+    list(
+        participant = "Participants, n (%)",
+        isFemale = "Gender, n (%)",
+        idade_anos = "Age (years), median (IQR)", 
+        CovidConfirmadoCasa = "Cohabitation - lives with a SARS-CoV-2 infected person, n(%)", 
+        ProfissionalSaude = "Health professional, n (%)", 
+        Coriza = "Coryza", 
+        Tosse = "Cough", 
+        Mialgia = "Myalgia", 
+        DorGarganta = "Sore throat", 
+        Febre = "Fever",
+        Diarreia = "Diarrhea", 
+        PerdaOlfato = "Loss of smell", 
+        Enjoo = "Nausea", 
+        FaltaAr = "Shortness of breath" 
+    )
 
 
-previsao_outofsample_raw <- predict(model_train, dados_outofsample, type = "raw")
-summary(previsao_outofsample_raw)
-99431/287714
+
+tb_descriptive_fp_fn <- 
+    dados_after_pred %>% 
+    gtsummary::tbl_summary(
+        by = type,
+        label = ls_desc_labels_fp_fn
+    ) %>% 
+    gtsummary::add_overall(col_label =  "Total")
+
+
+
+# Exporting Table
+write_excel_csv(tb_descriptive_fp_fn$table_body %>%
+               select(Characteristics = var_label,
+                      Total    = stat_0,
+                      false_negative = stat_1,
+                      false_positive = stat_2),
+           "Output/Main/table2_descriptive_false_negative_false_positive_2020-07-27.csv")
+
