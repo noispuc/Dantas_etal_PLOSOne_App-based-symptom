@@ -577,7 +577,7 @@ previsao_outofsample <- predict(model_train, dados_outofsample, type = "prob")[,
 value_class<-factor(ifelse(previsao_outofsample > 0.5, 1, 0))
 previsao_outofsample2<-data.frame(previsao_outofsample, value_class)
 summary(previsao_outofsample2$value_class)
-99431/287714
+
 write_csv(previsao_outofsample2, "Output/Main/probabilidades_outofsample2.csv")
 
 
