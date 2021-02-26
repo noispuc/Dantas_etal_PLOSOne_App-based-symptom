@@ -1,0 +1,6 @@
+Method;Downsampling;Upsampling;SMOTE;ROSE
+Logistic Regression;0.250;0.250;0.220;0.250
+Random Forest;0.250;0.250;0.230;0.250
+Decision Tree;0.240;0.210;0.250;0.150
+Gradient Boosting;0.250;0.260;0.250;0.050
+Naive Bayes;0.220;0.220;0.200;0.220
