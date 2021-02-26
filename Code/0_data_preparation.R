@@ -3,13 +3,8 @@
 # App-based symptom tracking to optimize SARS-CoV-2 testing strategy using machine learning
 # ########################################
 
-
-
 # Libraries ---------------------------------------------------------------
 library(tidyverse)
-
-
-
 
 # Data input and preparation ----------------------------------------------
 dados = read_delim("Data/ddb_modelo_temporal_16-07_testes.csv",";", escape_double = FALSE, trim_ws = TRUE)
