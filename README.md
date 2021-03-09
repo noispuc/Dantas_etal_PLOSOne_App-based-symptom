@@ -4,4 +4,4 @@ Data for the paper "App-based symptom tracking to optimize SARS-CoV-2 testing st
 Authors: Leila F. Dantas, Igor T. Peres, Leonardo S.L. Bastos, Janaina F. Marchesi, Guilherme F.G. de Souza, João Gabriel M. Gelli, Fernanda A. Baião, Paula Maçaira, Silvio Hamacher, Fernando A. Bozza
 
 
-This work is in progress and under review.
+As of March 2021, this work has been accepted to a forthcoming issue of the PLOS One Journal.
